@@ -1,5 +1,7 @@
 package de.firecreeper82;
 
+import java.util.Scanner;
+
 public class Game {
 
     public final int[][] board;
@@ -18,8 +20,62 @@ public class Game {
 
         printBoard(board);
 
-
+        play(true);
     }
+
+    private void play(boolean white) {
+        print("Your move: ");
+        Scanner scanner = new Scanner(System.in);
+
+        String input = scanner.next();
+        scanner.close();
+
+        String piece = String.valueOf(input.charAt(0));
+        char row = input.charAt(1);
+        int column = Integer.parseInt(String.valueOf(input.charAt(2)));
+
+        movePiece(white, piece, row, column);
+
+        play(!white);
+    }
+
+    private void movePiece(boolean white, String piece, char row, int column ) {
+        int index1 = -1;
+        int index2 = -1;
+
+        int pieceIntRepresentation = white ? 1 : 0;
+        switch (piece.toLowerCase()) {
+            case "k" -> pieceIntRepresentation += 11;
+            case "q" -> pieceIntRepresentation += 9;
+            case "b" -> pieceIntRepresentation += 7;
+            case "n" -> pieceIntRepresentation += 5;
+            case "r" -> pieceIntRepresentation += 3;
+            case "p" -> pieceIntRepresentation += 1;
+            default -> throw new RuntimeException("Invalid Piece");
+        }
+
+        for(int i = 0; i < board.length; i++) {
+            for(int j = 0; j < board[i].length; j++) {
+                if(board[i][j] == pieceIntRepresentation) {
+                    index1 = i;
+                    index2 = j;
+                    break;
+                }
+            }
+        }
+
+        int rowInt = row - 'A';
+        column -= 1;
+
+        if(index1 < 0 || rowInt > 7 || column > 7)
+            throw new RuntimeException("Invalid Position");
+
+        board[index1][index2] = 0;
+        board[column][rowInt] = pieceIntRepresentation;
+
+        printBoard(board);
+    }
+
 
     private static final String reset = "\u001B[0m";
     private static final String black = "\u001B[100m";
@@ -41,19 +97,22 @@ public class Game {
 
     private void printBoard(int[][] board) {
 
-        System.out.print("    ");
+        println();
+        println();
+
+        print("    ");
 
         for(int i = 0; i < 8; i++) {
-            System.out.print(" " + bold + alphabet[i] + "    ");
+            print(" " + bold + alphabet[i] + "    ");
         }
 
-        System.out.println();
-        System.out.println();
+        println();
+        println();
 
         for (int i = 0; i < board.length; i++) {
             int num = i + 1;
 
-            System.out.print(bold + num + reset + "   ");
+            print(bold + num + reset + "   ");
 
             int marker = (i % 2 == 0) ? 1 : 0;
 
@@ -61,7 +120,7 @@ public class Game {
                 int currentPosition = board[i][j];
 
                 String backgroundColor = (marker % 2 == 0) ? black : white;
-                System.out.print(backgroundColor + bold);
+                print(backgroundColor + bold);
 
                 String printChar = block;
 
@@ -76,23 +135,34 @@ public class Game {
                     case 11, 12 -> printChar = king;
                 }
 
-                System.out.print(foregroundColor + printChar + reset + "   ");
+                print(foregroundColor + printChar + reset + "   ");
 
 
                 marker++;
             }
 
-            System.out.print(bold + num);
+            print(bold + num);
 
-            System.out.println();
-            System.out.println();
+            println();
+            println();
         }
 
-        System.out.print("    ");
+        print("    ");
 
         for(int i = 0; i < 8; i++) {
-            System.out.print(" " + bold + alphabet[i] + "    ");
+            print(" " + bold + alphabet[i] + "    ");
         }
+
+        println();
+        println();
+    }
+
+    private void print(String s) {
+        System.out.print(s);
+    }
+
+    private void println() {
+        System.out.println();
     }
 
     public static void main(String[] args) {
